@@ -1,0 +1,17 @@
+#!/usr/bin/python
+
+
+def trade():
+    cour = []
+    line = ""
+    while True:
+        line = raw_input()
+        if line.strip() == "-end-" or line.strip() == "-END-":
+            break
+        cour.append(int(line))
+    
+
+try:
+    trade()
+except Exception as inst:
+    print inst
