@@ -1,17 +1,36 @@
 #!/usr/bin/python
 
+import sys
+
+def init():
+    global nbDay
+    global capital
+    capital = float(sys.stdin.readline())
+    nbDay = int(sys.stdin.readline())
+    
+def buy(n):
+    print("buy {0}".format(n))
+    sys.stdout.flush()
+
+def sell(n):
+    print("sell {0}".format(n))
+    sys.stdout.flush()
+
+def wait():
+    print("wait")
+    sys.stdout.flush()
 
 def trade():
-    cour = []
-    line = ""
-    while True:
-        line = raw_input()
-        if line.strip() == "-end-" or line.strip() == "-END-":
-            break
-        cour.append(int(line))
+    i = 0
+    while i < nbDay:
+        line = sys.stdin.readline()
+        # choisir ici les algo
+        wait()
+        i = i + 1
     
-
-try:
+def main():
+    init()
     trade()
-except Exception as inst:
-    print inst
+
+if __name__ == "__main__":
+    main()
