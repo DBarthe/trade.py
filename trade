@@ -10,22 +10,22 @@ def init():
     
 def buy(n):
     print("buy {0}".format(n))
-    sys.stdout.flush()
 
 def sell(n):
     print("sell {0}".format(n))
-    sys.stdout.flush()
+    
 
 def wait():
     print("wait")
-    sys.stdout.flush()
+
 
 def trade():
     i = 0
+
     while i < nbDay:
         line = sys.stdin.readline()
-        # choisir ici les algo
         wait()
+        sys.stdout.flush()
         i = i + 1
     
 def main():
