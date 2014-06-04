@@ -1,36 +1,14 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys
 
-def init():
-    global nbDay
-    global capital
-    capital = float(sys.stdin.readline())
-    nbDay = int(sys.stdin.readline())
-    
-def buy(n):
-    print("buy {0}".format(n))
+import bdtrade
 
-def sell(n):
-    print("sell {0}".format(n))
-    
-
-def wait():
-    print("wait")
-
-
-def trade():
-    i = 0
-
-    while i < nbDay:
-        line = sys.stdin.readline()
-        wait()
-        sys.stdout.flush()
-        i = i + 1
-    
-def main():
-    init()
-    trade()
-
-if __name__ == "__main__":
-    main()
+trader = bdtrade.Trader()
+trader.run()
+"""
+while True:
+	sys.stderr.write(sys.stdin.readline())
+	print ("wait")
+	sys.stdout.flush()
+"""
