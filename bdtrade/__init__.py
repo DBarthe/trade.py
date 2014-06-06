@@ -30,9 +30,9 @@ class Trader:
             if eva == Stats.EVAL_WAIT:
                 self.__wait()
             elif eva == Stats.EVAL_BUY:
-                self.__trybuy(int(self.__howManySharesCouldIBuy() * 0.3))
+                self.__trybuy(int(self.__howManySharesCouldIBuy() * 0.25))
             else:
-                self.__trysell(int(self._box.nshares * 0.3))
+                self.__trysell(int(self._box.nshares * 0.25))
 
     def __howManySharesCouldIBuy(self):
         return int((self._box.capital - Box.calcCommission(self._box.capital))\
