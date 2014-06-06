@@ -35,8 +35,8 @@ class Input:
 		sys.stdin.flush()
 		line = self._inp.readline()
 		# for debug:
-		sys.stderr.write("readline="+line)
-		sys.stderr.flush()
+		#sys.stderr.write("readline="+line)
+		#sys.stderr.flush()
 		return line
 
 	def __readInt(self):

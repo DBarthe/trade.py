@@ -1,3 +1,4 @@
+import math
 
 class Box:
 	def __init__(self, capital, nshares=0):
@@ -16,7 +17,11 @@ class Box:
 	def nshares(self):
 		return self._nshares
 
+	def calcCommission(total):
+		return math.ceil(total * 0.0015)
+
 	def purchase(self, cost, nshares):
+		cost += Box.calcCommission(cost)
 		assert(cost >= 0)
 		assert(nshares >= 0)
 		if cost <= self._capital:
@@ -27,6 +32,7 @@ class Box:
 			return False
 		
 	def sale(self, income, nshares):
+		income -= Box.calcCommission(income)
 		assert(income >= 0)
 		assert(nshares >= 0)
 		if nshares <= self._nshares:

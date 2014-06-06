@@ -23,20 +23,13 @@ class Trader:
             sys.stderr.write(str(self._inp)+", "+str(self._stats)+", "+str(self._box)+"\n")
             sys.stderr.flush()
 
+
     def __decide(self):
-        self._stats.calcMovingAvg()
-        gap = self._stats.moving_avg - self._inp.curprice
-        relation = gap / self._inp.curprice
-        sign = 0 if gap == 0 else (1 if gap > 0 else -1)
-        if sign == 1:
-            self.__trysell(int(0.2 * self._box.nshares))
-        elif sign == -1:
-            self.__trybuy(int(0.2 * self.__howManySharesCouldIBuy()))
-        else:
-            self.__wait()
+        self.__wait()
 
     def __howManySharesCouldIBuy(self):
-        return self._box.capital / self._inp.curprice
+        return int((self._box.capital - Box.calcCommission(self._box.capital))\
+                 / self._inp.curprice)
 
     def __trybuy(self, nshares):
         if self._inp.curprice > 0:
