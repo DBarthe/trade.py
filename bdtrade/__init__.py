@@ -23,7 +23,7 @@ class Trader:
                 self.__decide()
 
     def __decide(self):
-        if self._inp.curday < 26:
+        if self._inp.curday < 0:
             self.__wait()
         else:
             eva = self._stats.eval()
