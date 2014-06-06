@@ -7,32 +7,41 @@ from bdtrade.executor import Executor
 from bdtrade.stats import Stats
 
 class Trader:
-    def __init__(self):
+    INDICE = 0.25
+    WAIT_DAYS = 0
+
+    def __init__(self, verbose=False):
         self._inp = Input()
         self._box = Box(self._inp.startK)
         self._stats = Stats()
+        self._verbose = verbose
+        if self._verbose:
+            Executor.logOn()
 
     def run(self):
         while self._inp.nextDay() is not None:
             self._stats.feed(self._inp.curprice)
-            sys.stderr.write("***********\n"+str(self._inp)+"\n"+str(self._stats)+"\n"+str(self._box)+"\n")
-            sys.stderr.flush()
+
+            if self._verbose:
+                Executor.log("***********\n"+str(self._inp)+"\n"+str(self._stats)+\
+                    "\n"+str(self._box)+"\n")
+
             if self._inp.isLastDay():
                 self.__destock()
             else:
                 self.__decide()
 
     def __decide(self):
-        if self._inp.curday < 26:
+        if self._inp.curday < Trader.WAIT_DAYS:
             self.__wait()
         else:
             eva = self._stats.eval()
             if eva == Stats.EVAL_WAIT:
                 self.__wait()
             elif eva == Stats.EVAL_BUY:
-                self.__trybuy(int(self.__howManySharesCouldIBuy() * 0.3))
+                self.__trybuy(int(self.__howManySharesCouldIBuy() * Trader.INDICE))
             else:
-                self.__trysell(int(self._box.nshares * 0.3))
+                self.__trysell(int(self._box.nshares * Trader.INDICE))
 
     def __howManySharesCouldIBuy(self):
         return int((self._box.capital - Box.calcCommission(self._box.capital))\

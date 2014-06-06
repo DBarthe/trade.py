@@ -1,8 +1,12 @@
 #!/usr/bin/python3
 
 import sys
-
 import bdtrade
 
-trader = bdtrade.Trader()
-trader.run()
+try:
+	trader = bdtrade.Trader(verbose=False)
+	trader.run()
+except:
+	err = sys.exc_info()[1]
+	sys.stderr.write("Error: {0}\n".format(err))
+
