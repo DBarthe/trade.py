@@ -1,101 +1,96 @@
 
-LONG_TERM = 60
-MEDIUM_TERM = 30
-SHORT_TERM = 15
-
-class MovingAvg:
+class EMA:
 	def __init__(self):
 		self._value = None
-		self._gap = None
-		self._rel = None
-		self._len = None
 		self._archives = []
-		self._speed = None
-		self._speed_rel = None
+
+	def __str__(self):
+		return str(self._value)
 
 	@property
 	def value(self): return self._value
 	@property
-	def gap(self): return self._gap
-	@property
-	def rel(self): return self._rel
-	@property
-	def len(self): return self._len
-	@property
-	def archives(self): return sefl._archives
-	@property
-	def archive(self, n): return self._archive[n]
-	@property
-	def speed(self): return self._speed
-	@property
-	def speed_rel(self): return self._speed_rel
+	def archives(self): return self._archives
 
-	def __calcTriangularNbr(n):
-		return (n * (n + 1)) / 2
+	def __calc(values, t, a):
+		assert(t >= 0)
+		if t == 0:
+			return values[0]
+		else:
+			return a * values[t] + (1 - a) * EMA.__calc(values, t - 1, a)
 
 	def update(self, values):
-		if len(values) > 0:
-			self._value = \
-				sum([(i + 1) * xi for i, xi in enumerate(values)]) / \
-				MovingAvg.__calcTriangularNbr(len(values))
-			self._gap = values[-1] - self._value
-			self._rel = abs(self._gap) / values[-1]
-			self._len = len(values)
-			self._archives.append(self._value)
-			if len(self._archives) >= 2:
-				self._speed = self._archives[-1] - self._archives[-2]
-				self._speed_rel = abs(self._speed) / self._value
+		a = 2 / (len(values) + 1)
+		self._value = EMA.__calc(values, len(values) - 1, a)
+		self._archives.append(self._value)
+
+
+class MACD:
+	def __init__(self):
+		self._delta = None
+		self._signal = EMA()
+		self._archives = []
+
+	@property
+	def delta(self): return self._delta
+
+	def __signOf(n):
+		return 1 if n >= 0 else -1
+
+	def isCrossOver(self):
+		if len(self._archives) < 2:
+			return 0
+		else:
+			prev_sign = MACD.__signOf(self._archives[-2] - self._signal.archives[-2])
+			cur_sign = MACD.__signOf(self._delta - self._signal.value)
+			if prev_sign == cur_sign:
+				return 0
+			elif cur_sign == 1:
+				return 1
+			else:
+				return -1
+
+	def update(self, ema12, ema26):
+		self._delta = ema12.value - ema26.value
+		self._archives.append(self._delta)
+		start = max(0, len(self._archives) - 9)
+		self._signal.update(self._archives[start:])
 
 
 class Stats:
+	EVAL_BUY = 1
+	EVAL_SELL = 2
+	EVAL_WAIT = 0
+
 	def __init__(self):
 		self._values = []
 		self._last = None
-		self._mavg_total = MovingAvg()
-		self._mavg_long = MovingAvg()
-		self._mavg_medium = MovingAvg()
-		self._mavg_short = MovingAvg()
-		self._speed = None
+		self._ema12 = EMA()
+		self._ema26 = EMA()
+		self._macd = MACD()
 
 	def __str__(self):
-		return "Stats(nvalues:{0}, mavg_tot:{1}, mavg_long:{2}, mavg_medium:{3}, mavg_short:{4})"\
-			.format(len(self._values), self._mavg_total, self._mavg_long, self._mavg_medium, self._mavg_short)
-
-	@property
-	def mavg_total(self): return self._mavg_total
-	@property
-	def mavg_long(self): return self._mavg_long
-	@property
-	def mavg_medium(self): return self._mavg_medium
-	@property
-	def mavg_short(self): return self._mavg_short
-	@property
-	def speed(self): return self._speed
-	@property
-	def tendance(self): return self._tendance
+		return "Stats(nvalues:{0}, ema12:{1}, ema26:{2}, macd:{3})"\
+			.format(len(self._values), self._ema12, self._ema26, self._macd.isCrossOver())
 
 	def feed(self, value):
 		self._values.append(value)
 		self._last = value
-		self.__calcMovingAvgTotal()
-		self.__calcMovingAvgLong()
-		self.__calcMovingAvgMedium()
-		self.__calcMovingAvgShort()
-		if len(self._values) >= 2:
-			self._speed = self._values[-1] - self._values[-2]
+		self.__calcEMA(self._ema12, 12)
+		self.__calcEMA(self._ema26, 26)
+		self._macd.update(self._ema12, self._ema26)
 
-	def __calcMovingAvg(self, mavg, term):
-		start = max(0, len(self._values) - term)
-		mavg.update(self._values[start:])
+	def __calcEMA(self, ema, period):
+		start = max(0, len(self._values) - period)
+		ema.update(self._values[start:])
 
-	def __calcMovingAvgTotal(self):
-		self._mavg_total.update(self._values)
+	def eval(self):
+		macd_res = self._macd.isCrossOver()
+		if macd_res == 0:
+			return Stats.EVAL_WAIT
+		elif macd_res == 1:
+			return Stats.EVAL_BUY
+		else:
+			return Stats.EVAL_SELL
 
-	def __calcMovingAvgLong(self):
-		self.__calcMovingAvg(self._mavg_long, LONG_TERM)
 
-	def __calcMovingAvgMedium(self):
-		self.__calcMovingAvg(self._mavg_medium, MEDIUM_TERM)
-
-	def __calcMovingAvgShort(self):
-		self.__calcMovingAvg(self._mavg_short, SHORT_TERM)

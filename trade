@@ -6,9 +6,3 @@ import bdtrade
 
 trader = bdtrade.Trader()
 trader.run()
-"""
-while True:
-	sys.stderr.write(sys.stdin.readline())
-	print ("wait")
-	sys.stdout.flush()
-"""

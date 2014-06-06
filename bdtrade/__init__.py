@@ -15,17 +15,24 @@ class Trader:
     def run(self):
         while self._inp.nextDay() is not None:
             self._stats.feed(self._inp.curprice)
+            sys.stderr.write("***********\n"+str(self._inp)+"\n"+str(self._stats)+"\n"+str(self._box)+"\n")
+            sys.stderr.flush()
             if self._inp.isLastDay():
                 self.__destock()
             else:
                 self.__decide()
-            # for debug :
-            sys.stderr.write(str(self._inp)+", "+str(self._stats)+", "+str(self._box)+"\n")
-            sys.stderr.flush()
-
 
     def __decide(self):
-        self.__wait()
+        if self._inp.curday < 26:
+            self.__wait()
+        else:
+            eva = self._stats.eval()
+            if eva == Stats.EVAL_WAIT:
+                self.__wait()
+            elif eva == Stats.EVAL_BUY:
+                self.__trybuy(int(self.__howManySharesCouldIBuy() * 0.3))
+            else:
+                self.__trysell(int(self._box.nshares * 0.3))
 
     def __howManySharesCouldIBuy(self):
         return int((self._box.capital - Box.calcCommission(self._box.capital))\
