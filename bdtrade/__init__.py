@@ -7,7 +7,7 @@ from bdtrade.executor import Executor
 from bdtrade.stats import Stats
 
 class Trader:
-    INDICE = 0.25
+    INDICE = 0.20
     WAIT_DAYS = 0
 
     def __init__(self, verbose=False):
